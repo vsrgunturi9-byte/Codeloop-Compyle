@@ -238,7 +238,7 @@ router.post('/execute', [
         }));
 
         // Calculate overall score
-        const passedTests = testResults.filter(test => testResult.status === 'accepted').length;
+        const passedTests = testResults.filter(test => test.status === 'accepted').length;
         const totalScore = Math.round((passedTests / testResults.length) * 100);
 
         res.json({
@@ -675,13 +675,11 @@ router.post('/assessment-submit', [
         try {
           const response = await axios.post(`${JUDGE0_API_URL}/submissions`, submission, {
             headers: {
-              'headers': {
-                'X-RapidAPI-Key': JUDGE0_API_KEY,
-                'X-RapidAPI-Host': JUDGE0_API_HOST,
-                'Content-Type': 'application/json'
-              },
-              timeout: 30000
-            }
+              'X-RapidAPI-Key': JUDGE0_API_KEY,
+              'X-RapidAPI-Host': JUDGE0_API_HOST,
+              'Content-Type': 'application/json'
+            },
+            timeout: 30000
           });
 
           const token = response.data.token;
