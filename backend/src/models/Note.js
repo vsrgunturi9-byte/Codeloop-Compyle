@@ -127,39 +127,39 @@ noteSchema.statics.findByUserAccess = async function(userId, options = {}) {
   const User = mongoose.model('User');
 
   const user = await User.findById(userId).populate('role');
-      const query = {
-        isActive: true,
+
+  const query = {
+    isActive: true,
+    $or: [
+      { uploadedBy: userId },
+      { isPublic: true },
+      { department: user.department },
+      { groups: { $in: user.groups } },
+      { allowedRoles: { $in: [user.role.name] } }
+    ]
+  };
+
+  if (category) query.category = category;
+  if (search) {
+    query.$and = [
+      {
         $or: [
-          { uploadedBy: userId },
-          { isPublic: true },
-          { department: user.department },
-          { groups: { $in: user.groups } },
-          { allowedRoles: { $in: [user.role] } }
+          { title: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+          { tags: { $in: [new RegExp(search, 'i')] } }
         ]
-      };
-
-      if (category) query.category = category;
-      if (search) {
-        query.$and = [
-          {
-            $or: [
-              { title: { $regex: search, $options: 'i' } },
-              { description: { $regex: search, $options: 'i' } },
-              { tags: { $in: [new RegExp(search, 'i')] } }
-            ]
-          }
-        ];
       }
+    ];
+  }
 
-      return this.find(query)
-        .populate('uploadedBy', 'fullName')
-        .populate('department', 'name code')
-        .populate('groups', 'name code')
-        .populate('modules', 'title')
-        .sort({ createdAt: -1 })
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
-    });
+  return this.find(query)
+    .populate('uploadedBy', 'fullName')
+    .populate('department', 'name code')
+    .populate('groups', 'name code')
+    .populate('modules', 'title')
+    .sort({ createdAt: -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
 };
 
 // Static method to find notes by module
