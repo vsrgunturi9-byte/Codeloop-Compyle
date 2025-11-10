@@ -149,15 +149,17 @@ moduleSchema.statics.findByDepartment = function(departmentId, options = {}) {
 };
 
 // Static method to find modules accessible to user
-moduleSchema.statics.findByUser = function(userId, options = {}) {
+moduleSchema.statics.findByUser = async function(userId, options = {}) {
   const { page = 1, limit = 10, search = '' } = options;
   const User = mongoose.model('User');
+
+  const user = await User.findById(userId).select('groups');
 
   return this.find({
     isActive: true,
     $or: [
       { createdBy: userId },
-      { 'groups': { $in: await User.findById(userId).select('groups') } }
+      { 'groups': { $in: user.groups } }
     ],
     $and: search ? [
       {
