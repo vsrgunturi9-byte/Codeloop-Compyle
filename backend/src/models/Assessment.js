@@ -279,23 +279,23 @@ assessmentSchema.statics.findByUser = async function(userId, options = {}) {
   const User = mongoose.model('User');
 
   const user = await User.findById(userId);
-      const query = {
-        isActive: true,
-        $or: [
-          { createdBy: userId },
-          { groups: { $in: user.groups } }
-        ]
-      };
-      if (status) query.status = status;
 
-      return this.find(query)
-        .populate('createdBy', 'fullName')
-        .populate('department', 'name code')
-        .populate('groups', 'name code')
-        .sort({ startTime: -1 })
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
-    });
+  const query = {
+    isActive: true,
+    $or: [
+      { createdBy: userId },
+      { groups: { $in: user.groups } }
+    ]
+  };
+  if (status) query.status = status;
+
+  return this.find(query)
+    .populate('createdBy', 'fullName')
+    .populate('department', 'name code')
+    .populate('groups', 'name code')
+    .sort({ startTime: -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
 };
 
 assessmentSchema.statics.getWithDetails = function(assessmentId) {
