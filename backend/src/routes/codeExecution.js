@@ -675,13 +675,11 @@ router.post('/assessment-submit', [
         try {
           const response = await axios.post(`${JUDGE0_API_URL}/submissions`, submission, {
             headers: {
-              'headers': {
-                'X-RapidAPI-Key': JUDGE0_API_KEY,
-                'X-RapidAPI-Host': JUDGE0_API_HOST,
-                'Content-Type': 'application/json'
-              },
-              timeout: 30000
-            }
+              'X-RapidAPI-Key': JUDGE0_API_KEY,
+              'X-RapidAPI-Host': JUDGE0_API_HOST,
+              'Content-Type': 'application/json'
+            },
+            timeout: 30000
           });
 
           const token = response.data.token;
