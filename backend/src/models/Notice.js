@@ -101,33 +101,33 @@ noticeSchema.statics.findByUser = async function(userId, options = {}) {
   const User = mongoose.model('User');
 
   const user = await User.findById(userId).populate('role');
-      const query = {
-        isActive: true,
-        $or: [
-          { targetType: 'all' },
-          { targetType: 'role', targetRoles: { $in: [user.role.name] } },
-          { targetType: 'department', department: user.department },
-          { targetType: 'group', groups: { $in: user.groups } }
-        ],
-        $or: [
-          { expiresAt: { $exists: false } },
-          { expiresAt: { $gt: new Date() } }
-        ]
-      };
 
-      // Filter for unread notices
-      if (unread) {
-        query['readBy.user'] = { $ne: userId };
-      }
+  const query = {
+    isActive: true,
+    $or: [
+      { targetType: 'all' },
+      { targetType: 'role', targetRoles: { $in: [user.role.name] } },
+      { targetType: 'department', department: user.department },
+      { targetType: 'group', groups: { $in: user.groups } }
+    ],
+    $or: [
+      { expiresAt: { $exists: false } },
+      { expiresAt: { $gt: new Date() } }
+    ]
+  };
 
-      return this.find(query)
-        .populate('postedBy', 'fullName')
-        .populate('department', 'name code')
-        .populate('groups', 'name code')
-        .sort({ priority: -1, createdAt: -1 })
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
-    });
+  // Filter for unread notices
+  if (unread) {
+    query['readBy.user'] = { $ne: userId };
+  }
+
+  return this.find(query)
+    .populate('postedBy', 'fullName')
+    .populate('department', 'name code')
+    .populate('groups', 'name code')
+    .sort({ priority: -1, createdAt: -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
 };
 
 // Static method to get unread count for user
