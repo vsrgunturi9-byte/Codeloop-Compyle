@@ -131,30 +131,29 @@ noticeSchema.statics.findByUser = async function(userId, options = {}) {
 };
 
 // Static method to get unread count for user
-noticeSchema.statics.getUnreadCount = function(userId) {
+noticeSchema.statics.getUnreadCount = async function(userId) {
   const User = mongoose.model('User');
 
-  return User.findById(userId)
-    .then(user => {
-      return this.countDocuments({
-        isActive: true,
+  const user = await User.findById(userId).populate('role');
+
+  return this.countDocuments({
+    isActive: true,
+    $or: [
+      { targetType: 'all' },
+      { targetType: 'role', targetRoles: { $in: [user.role.name] } },
+      { targetType: 'department', department: user.department },
+      { targetType: 'group', groups: { $in: user.groups } }
+    ],
+    $and: [
+      { 'readBy.user': { $ne: userId } },
+      {
         $or: [
-          { targetType: 'all' },
-          { targetType: 'role', targetRoles: { $in: [user.role.name] } },
-          { targetType: 'department', department: user.department },
-          { targetType: 'group', groups: { $in: user.groups } }
-        ],
-        $and: [
-          { 'readBy.user': { $ne: userId } },
-          {
-            $or: [
-              { expiresAt: { $exists: false } },
-              { expiresAt: { $gt: new Date() } }
-            ]
-          }
+          { expiresAt: { $exists: false } },
+          { expiresAt: { $gt: new Date() } }
         ]
-      });
-    });
+      }
+    ]
+  });
 };
 
 // Static method to find notices by department
