@@ -213,7 +213,7 @@ assessmentSchema.methods.isAccessible = function(userId) {
   return true;
 };
 
-assessmentessmentSchema.methods.getStatus = function() {
+assessmentSchema.methods.getStatus = function() {
   const now = new Date();
 
   if (!this.isPublished) return 'draft';
