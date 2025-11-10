@@ -96,12 +96,11 @@ noticeSchema.virtual('isExpired').get(function() {
 });
 
 // Static method to find notices for user
-noticeSchema.statics.findByUser = function(userId, options = {}) {
+noticeSchema.statics.findByUser = async function(userId, options = {}) {
   const { page = 1, limit = 10, unread = false } = options;
   const User = mongoose.model('User');
 
-  return User.findById(userId)
-    .then(user => {
+  const user = await User.findById(userId).populate('role');
       const query = {
         isActive: true,
         $or: [
