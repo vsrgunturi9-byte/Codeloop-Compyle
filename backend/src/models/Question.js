@@ -231,15 +231,17 @@ questionSchema.statics.findByType = function(type, options = {}) {
 };
 
 // Static method to find questions by user access
-questionSchema.statics.findByUserAccess = function(userId, options = {}) {
+questionSchema.statics.findByUserAccess = async function(userId, options = {}) {
   const { type = null, page = 1, limit = 10, search = '' } = options;
   const User = mongoose.model('User');
+
+  const user = await User.findById(userId).select('department');
 
   return this.find({
     isActive: true,
     $or: [
       { createdBy: userId },
-      { department: await User.findById(userId).select('department') }
+      { department: user.department }
     ],
     ...(type && { type }),
     ...(search && {
