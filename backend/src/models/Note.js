@@ -122,12 +122,11 @@ noteSchema.virtual('fileExtension').get(function() {
 });
 
 // Static method to find notes by user access
-noteSchema.statics.findByUserAccess = function(userId, options = {}) {
+noteSchema.statics.findByUserAccess = async function(userId, options = {}) {
   const { page = 1, limit = 10, category = null, search = '' } = options;
   const User = mongoose.model('User');
 
-  return User.findById(userId)
-    .then(user => {
+  const user = await User.findById(userId).populate('role');
       const query = {
         isActive: true,
         $or: [
