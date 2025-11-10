@@ -238,7 +238,7 @@ router.post('/execute', [
         }));
 
         // Calculate overall score
-        const passedTests = testResults.filter(test => testResult.status === 'accepted').length;
+        const passedTests = testResults.filter(test => test.status === 'accepted').length;
         const totalScore = Math.round((passedTests / testResults.length) * 100);
 
         res.json({
